@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -21,11 +22,18 @@ import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.IOException;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     Button fBtn;
     Button sBtn;
+    Classifier mClassifier;
+
+
+    private int mInputSize = 224;
+    private String mModelPath = "model.tflite";
+    private String mLabelPath = "labels.txt";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +44,8 @@ public class MainActivity extends AppCompatActivity {
         sBtn = findViewById(R.id.getSecondInfo);
         fBtn.setVisibility(View.GONE);
         sBtn.setVisibility(View.GONE);
+
+        mClassifier = new Classifier(getAssets(),mModelPath,mLabelPath,mInputSize);
 
 
         if (Build.VERSION.SDK_INT >= 19 && Build.VERSION.SDK_INT < 21) {
@@ -81,6 +91,13 @@ public class MainActivity extends AppCompatActivity {
                 }
                 ImageView imageView = findViewById(R.id.imageView);
                 imageView.setImageBitmap(bitmap);
+                List<Classifier.Recognition> results = mClassifier.recognizeImage(bitmap);
+                if (results.isEmpty()){
+                    Log.d("result", results.toString());
+                }else{
+                    Log.d("result", results.toString());
+
+                }
 
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 Exception error = result.getError();
